@@ -1,26 +1,71 @@
-import { create } from 'zustand'
-import { cart, currentCart } from '@wix/ecom'
+import { create } from 'zustand';
+import { currentCart } from '@wix/ecom';
 import { WixClient } from '@/context/wixContext';
 
-type cartState = {
-    cart: currentCart.Cart;
-    isLoading: boolean;
-    counter: number;
-    getCart: (wixClient:WixClient) => void
-    addItem: (wixClient:WixClient,productId: string, variantId: string, quantity: number) => void
-    removeItem: (wixClient:WixClient,itemId: string) => void
-}
+type CartItem = {
+  _id: string;
+  productName: { original: string };
+  price: { amount: string };
+  quantity: number;
+  availability?: { status: string };
+  image?: string;
+};
 
-export const useCartStore = create<cartState>((set) => ({
-    cart: [],
-    isLoading: true,
-    counter: 0,
-    getCart: async (wixClient) => {
+type Cart = {
+  lineItems: CartItem[];
+  subtotal: {
+    amount: string;
+    convertedAmount: string;
+    formattedAmount: string;
+    formattedConvertedAmount: string;
+  };
+  currency: string;
+  conversionCurrency: string;
+};
+
+type CartState = {
+  cart: Cart | null;
+  isLoading: boolean;
+  counter: number;
+  getCart: (wixClient: WixClient) => void;
+  addItem: (wixClient: WixClient, productId: string, variantId: string, quantity: number) => void;
+  removeItem: (wixClient: WixClient, itemId: string) => void;
+  clearCart: () => void; // Ensure `clearCart` is typed and added here
+};
+
+export const useCartStore = create<CartState>((set) => ({
+  cart: null,
+  isLoading: true,
+  counter: 0,
+  getCart: async (wixClient) => {
+    try {
+      // Make sure cart is fetched correctly and handle potential null values
       const cart = await wixClient.currentCart.getCurrentCart();
-      set({ cart: cart || [], isLoading: false, counter: cart?.lineItems.length || 0 });
-    },
-    addItem: async (wixClient, productId, variantId, quantity) => {
-      set((state) => ({ ...state, isLoading: true }));
+      if (cart) {
+        set({
+          cart: cart as Cart,  // Explicitly cast the fetched cart to a Cart type
+          isLoading: false,
+          counter: cart.lineItems?.length || 0,
+        });
+      } else {
+        set({
+          cart: null,
+          isLoading: false,
+          counter: 0,
+        });
+      }
+    } catch (error) {
+      console.error('Error fetching cart:', error);
+      set({
+        cart: null,
+        isLoading: false,
+        counter: 0,
+      });
+    }
+  },
+  addItem: async (wixClient, productId, variantId, quantity) => {
+    set((state) => ({ ...state, isLoading: true }));
+    try {
       const response = await wixClient.currentCart.addToCurrentCart({
         lineItems: [
           {
@@ -33,15 +78,35 @@ export const useCartStore = create<cartState>((set) => ({
           },
         ],
       });
-      set({ cart: response.cart, counter: response.cart?.lineItems.length, isLoading: false });
-    },
-    removeItem: async (wixClient, itemId) => {
-      set((state) => ({ ...state, isLoading: true }));
+      set({
+        cart: response.cart as Cart,  // Cast response.cart to Cart type
+        counter: response.cart?.lineItems.length || 0,
+        isLoading: false,
+      });
+    } catch (error) {
+      console.error('Error adding item to cart:', error);
+      set({
+        isLoading: false,
+      });
+    }
+  },
+  removeItem: async (wixClient, itemId) => {
+    set((state) => ({ ...state, isLoading: true }));
+    try {
       const response = await wixClient.currentCart.removeLineItemsFromCurrentCart([itemId]);
-      set({ cart: response.cart, counter: response.cart?.lineItems.length, isLoading: false });
-    },
-    clearCart: () => {
-      set({ cart: [] as unknown as currentCart.Cart, counter: 0 });
-    },
-  }));
-  
+      set({
+        cart: response.cart as Cart,  // Cast response.cart to Cart type
+        counter: response.cart?.lineItems.length || 0,
+        isLoading: false,
+      });
+    } catch (error) {
+      console.error('Error removing item from cart:', error);
+      set({
+        isLoading: false,
+      });
+    }
+  },
+  clearCart: () => {
+    set({ cart: null, counter: 0 });
+  },
+}));

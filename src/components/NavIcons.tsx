@@ -43,8 +43,7 @@ const NavIcons = () => {
       setIsLoggedIn(false); 
 
  
-      const { clearCart } = useCartStore.getState();
-      clearCart(); // Reset cart using Zustand's clearCart method
+      useCartStore.getState().clearCart();
 
 
       if (logoutUrl) {

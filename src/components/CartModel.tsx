@@ -10,6 +10,7 @@ const CartModel = () => {
   //   const cartitems = true;
   const wixClient = useWixClient();
   const { cart, isLoading, removeItem } = useCartStore();
+  console.log(cart)
   
   const handleCheckout = async () =>{
     try{
@@ -33,7 +34,7 @@ const CartModel = () => {
 
   return (
     <div className="w-max absolute p-4 rounded-md shadow-[0_3px_10px_rgb(0,0,0,0.2)] bg-white top-12 right-0 flex flex-col gap-6 z-20">
-      {!cart.lineItems ? (
+      {!cart?.lineItems ? (
         <div>Your Cart is Empty</div>
       ) : (
         <>
@@ -41,7 +42,7 @@ const CartModel = () => {
           {/* //List */}
           <div className="flex flex-col gap-8">
             {/* Items */}
-            {cart.lineItems.map((item) => (
+            {cart?.lineItems?.map((item) => (
               <div className="flex gap-4" key={item._id}>
                 {item.image && (
                   <Image
@@ -88,7 +89,7 @@ const CartModel = () => {
           <div className="">
             <div className="flex items-center justify-between font-semibold">
               <span className="">Subtotal</span>
-              <span className="">Rs.{cart.subtotal.amount}</span>
+              <span className="">Rs.{cart?.subtotal.amount || 0}</span>
             </div>
             <p className="text-gray-500 text-sm mt-2 mb-4">
               Shipping and taxes calculated at checkout
