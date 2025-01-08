@@ -41,7 +41,7 @@ export const useCartStore = create<cartState>((set) => ({
       set({ cart: response.cart, counter: response.cart?.lineItems.length, isLoading: false });
     },
     clearCart: () => {
-      set({ cart: [], counter: 0 });
+      set({ cart: [] as unknown as currentCart.Cart, counter: 0 });
     },
   }));
   
