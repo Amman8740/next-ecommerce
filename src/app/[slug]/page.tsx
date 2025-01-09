@@ -5,7 +5,6 @@ import { wixClientServer } from "@/lib/wixClientServer";
 import { notFound } from "next/navigation";
 
 const SinglePage = async ({ params }: { params: { slug: string } }) => {
-  console.log(params.slug);
   const wixClient = await wixClientServer();
   const products = await wixClient.products
     .queryProducts()
@@ -18,11 +17,9 @@ const SinglePage = async ({ params }: { params: { slug: string } }) => {
   const product = products.items[0];
   return (
     <div className="px-4 md-px-8 lg:px-16 xl:px-32 2xl:px-64 relative flex flex-col lg:flex-row gap-16">
-      {/* Image */}
       <div className="w-full lg:w-1/2 lg:sticky top-20 h-max ">
         <ProductImages items={product.media?.items} />
       </div>
-      {/* Text */}
       <div className="w-full lg:w-1/2 flex flex-col gap-6">
         <h1 className="text-4xl font-medium">{product.name}</h1>
         <p className="text-gray-500">{product.description}</p>

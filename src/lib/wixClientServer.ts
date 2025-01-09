@@ -25,7 +25,7 @@ export const wixClientServer = async () => {
         collections,
       },
       auth: OAuthStrategy({
-        clientId: process.env.NEXT_PUBLIC_WIX_CLIENT_ID || "",
+        clientId: process.env.WIX_CLIENT_ID || "",
         tokens: {
           refreshToken,
           accessToken: { value: "", expiresAt: 0 }, // Placeholder, refreshToken will fetch a valid accessToken
