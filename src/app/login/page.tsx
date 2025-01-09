@@ -14,10 +14,11 @@ enum MODE {
 }
 
 const LoginPage = () => {
-  const wixClient = useWixClient();
+  const getWixClient = useWixClient(); // This returns a Promise
   const router = useRouter();
   const pathName = usePathname();
 
+  const [wixClient, setWixClient] = useState<any>(null); // Initialize with null
   const [mode, setMode] = useState(MODE.LOGIN);
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
@@ -27,15 +28,29 @@ const LoginPage = () => {
   const [error, setError] = useState("");
   const [message, setMessage] = useState("");
 
-  // Check if logged in and redirect
   useEffect(() => {
-    if (wixClient.auth.loggedIn()) {
+    // Resolve the Promise and set the client
+    const initializeClient = async () => {
+      const client = await getWixClient;
+      setWixClient(client);
+    };
+
+    initializeClient();
+  }, [getWixClient]);
+
+  useEffect(() => {
+    if (wixClient && wixClient.auth.loggedIn()) {
       router.push("/");
     }
   }, [wixClient, router]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!wixClient) {
+      setError("Wix client not initialized.");
+      return;
+    }
+
     setIsLoading(true);
     setError("");
     setMessage("");
@@ -188,4 +203,3 @@ const LoginPage = () => {
 };
 
 export default LoginPage;
-

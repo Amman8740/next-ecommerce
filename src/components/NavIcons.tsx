@@ -21,7 +21,16 @@ const NavIcons = () => {
   const wixClient = useWixClient();
 
   useEffect(() => {
-    setIsLoggedIn(wixClient.auth.loggedIn());
+    const checkLoginStatus = async () => {
+      try {
+        const client = await wixClient; // Ensure wixClient is resolved
+        setIsLoggedIn(client.auth.loggedIn());
+      } catch (error) {
+        console.error("Failed to check login status:", error);
+      }
+    };
+
+    checkLoginStatus();
   }, [wixClient]);
 
   const handleProfile = () => {
@@ -35,16 +44,14 @@ const NavIcons = () => {
   const handleLogout = async () => {
     setIsLoading(true);
     try {
+      const client = await wixClient; // Ensure wixClient is resolved
       Cookies.remove("refreshToken");
 
-
-      const { logoutUrl } = await wixClient.auth.logout(window.location.href);
+      const { logoutUrl } = await client.auth.logout(window.location.href);
       setIsProfileOpen(false);
-      setIsLoggedIn(false); 
+      setIsLoggedIn(false);
 
- 
       useCartStore.getState().clearCart();
-
 
       if (logoutUrl) {
         router.push(logoutUrl);
@@ -58,16 +65,21 @@ const NavIcons = () => {
     }
   };
 
-
   const { cart, counter, getCart } = useCartStore();
   useEffect(() => {
-    if (isLoggedIn) {
-      getCart(wixClient); 
-    }
-  }, [wixClient, getCart, isLoggedIn]);
+    const fetchCart = async () => {
+      try {
+        if (isLoggedIn) {
+          const client = await wixClient; // Ensure wixClient is resolved
+          getCart(client);
+        }
+      } catch (error) {
+        console.error("Failed to fetch cart:", error);
+      }
+    };
 
-  console.log("Cart:", cart);
-  console.log("Is logged in:", isLoggedIn);
+    fetchCart();
+  }, [wixClient, getCart, isLoggedIn]);
 
   return (
     <div className="flex items-center gap-4 xl:gap-6 relative">
