@@ -28,7 +28,7 @@ export const wixClientServer = async () => {
         clientId: process.env.NEXT_PUBLIC_WIX_CLIENT_ID || "",
         tokens: {
           refreshToken,
-          accessToken: { value: "", expiresAt: 0 }, // Placeholder, refreshToken will fetch a valid accessToken
+          accessToken: { value: "", expiresAt: 0 },
         },
       }),
     });

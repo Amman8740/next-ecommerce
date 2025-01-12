@@ -39,11 +39,10 @@ export const useCartStore = create<CartState>((set) => ({
   counter: 0,
   getCart: async (wixClient) => {
     try {
-      // Make sure cart is fetched correctly and handle potential null values
       const cart = await wixClient.currentCart.getCurrentCart();
       if (cart) {
         set({
-          cart: cart as Cart,  // Explicitly cast the fetched cart to a Cart type
+          cart: cart as Cart, 
           isLoading: false,
           counter: cart.lineItems?.length || 0,
         });
@@ -79,7 +78,7 @@ export const useCartStore = create<CartState>((set) => ({
         ],
       });
       set({
-        cart: response.cart as Cart,  // Cast response.cart to Cart type
+        cart: response.cart as Cart,
         counter: response.cart?.lineItems.length || 0,
         isLoading: false,
       });
@@ -95,7 +94,7 @@ export const useCartStore = create<CartState>((set) => ({
     try {
       const response = await wixClient.currentCart.removeLineItemsFromCurrentCart([itemId]);
       set({
-        cart: response.cart as Cart,  // Cast response.cart to Cart type
+        cart: response.cart as Cart,
         counter: response.cart?.lineItems.length || 0,
         isLoading: false,
       });

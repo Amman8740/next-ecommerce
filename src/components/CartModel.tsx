@@ -12,12 +12,9 @@ const CartModel = () => {
 
   const handleCheckout = async () => {
     try {
-      // Await for `currentCart.createCheckoutFromCurrentCart`
       const checkout = await wixClient.currentCart.createCheckoutFromCurrentCart({
         channelType: currentCart.ChannelType.WEB,
       });
-
-      // Await for `redirects.createRedirectSession`
       const { redirectSession } = await wixClient.redirects.createRedirectSession({
         ecomCheckout: { checkoutId: checkout.checkoutId },
         callbacks: {
@@ -25,8 +22,6 @@ const CartModel = () => {
           thankYouPageUrl: `${window.location.origin}/success`,
         },
       });
-
-      // Redirect if URL is available
       if (redirectSession?.fullUrl) {
         window.location.href = redirectSession.fullUrl;
       }

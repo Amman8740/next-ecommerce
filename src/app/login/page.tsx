@@ -29,7 +29,6 @@ const LoginPage = () => {
   const [message, setMessage] = useState("");
 
   useEffect(() => {
-    // Resolve the Promise and set the client
     const initializeClient = async () => {
       const client = await getWixClient;
       setWixClient(client);
@@ -82,8 +81,7 @@ const LoginPage = () => {
       }
 
       if (!response) throw new Error("No response received");
-
-      // Handle login states
+      
       switch (response.loginState) {
         case LoginState.SUCCESS:
           const tokens = await wixClient.auth.getMemberTokensForDirectLogin(response.data.sessionToken!);
